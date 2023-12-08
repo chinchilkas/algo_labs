@@ -12,16 +12,14 @@ class Trie:
             if letter not in curr_node.children:
                 curr_node.children[letter] = TrieNode()
             curr_node = curr_node.children[letter]
-        curr_node.children["*"] = TrieNode()  # Mark the end of the word with "*"
+        curr_node.children["*"] = TrieNode()
 
     def print_nodes(self, node=None, current_path=""):
         if node is None:
             node = self.root
 
-        # Print the current node
         print(current_path)
 
-        # Recursively print child nodes
         for letter, child_node in node.children.items():
             if letter != "*":
                 self.print_nodes(child_node, current_path + letter)
@@ -47,3 +45,13 @@ class Trie:
             current_node = child_node
 
         return prefix if prefix else None
+
+    def search_word(self, word):
+        current_node = self.root
+
+        for letter in word:
+            if letter not in current_node.children:
+                return False
+            current_node = current_node.children[letter]
+
+        return "*" in current_node.children
