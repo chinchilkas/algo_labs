@@ -1,53 +1,49 @@
+class TrieNode:
+    def __init__(self):
+        self.children = {}
+
 class Trie:
     def __init__(self):
-        self.root = {"*": "*"}
+        self.root = TrieNode()
 
-    def add_word(self, words):
+    def add_word(self, word):
         curr_node = self.root
-        for word in words:
-            for letter in word:
-                if letter not in curr_node:
-                    curr_node[letter] = {}
-                curr_node = curr_node[letter]
-            curr_node["*"] = "*"
+        for letter in word:
+            if letter not in curr_node.children:
+                curr_node.children[letter] = TrieNode()
+            curr_node = curr_node.children[letter]
+        curr_node.children["*"] = TrieNode()  # Mark the end of the word with "*"
 
-    def print_nodes(self):
-        def dfs(node, current_path):
-            # Print the value of the current node
-            print(current_path)
+    def print_nodes(self, node=None, current_path=""):
+        if node is None:
+            node = self.root
 
-            # Recursively visit child nodes
-            for letter, child_node in node.items():
-                if letter != "*":
-                    dfs(child_node, current_path + letter)
+        # Print the current node
+        print(current_path)
 
-        dfs(self.root, "")
+        # Recursively print child nodes
+        for letter, child_node in node.children.items():
+            if letter != "*":
+                self.print_nodes(child_node, current_path + letter)
 
-    def prefix(self, words):
-        if not words:
-            return ""
+    def find_prefix_node(self, node):
+        children_count = sum(1 for child in node.children.values() if child)
+        if children_count >= 2 or "*" in node.children:
+            return node
+        for child_node in node.children.values():
+            if child_node:
+                result = self.find_prefix_node(child_node)
+                if result:
+                    return result
+        return None
 
-        # Sort the words to ensure that the common prefix is at the beginning
-        words.sort()
+    def prefix(self):
+        current_node = self.root
+        prefix = ""
 
-        # Consider the first and last words in the sorted list
-        first_word = words[0]
-        last_word = words[-1]
+        while len(current_node.children) == 1 and "*" not in current_node.children:
+            letter, child_node = current_node.children.popitem()
+            prefix += letter
+            current_node = child_node
 
-        # Find the common prefix character by character
-        common_prefix = ""
-        for i in range(len(first_word)):
-            if i < len(last_word) and first_word[i] == last_word[i]:
-                common_prefix += first_word[i]
-            else:
-                break
-
-        return common_prefix
-
-trie = Trie()
-words = ["apple", "apricot", "banana", "apex", "bat"]
-for word in words:
-    trie.add_word(word)
-prefix_word = ["apple", "apricot", "apex"]
-result = trie.prefix(prefix_word)
-print("prefix of word massif " + str(prefix_word) + " is: " + result)
+        return prefix if prefix else None
