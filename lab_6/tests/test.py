@@ -34,3 +34,11 @@ class TrieTest(unittest.TestCase):
         result = trie.prefix()
         expected_result = "ap"
         self.assertEqual(result, expected_result)
+
+    def test_word_in_trie(self):
+        trie = main.Trie()
+        words = ["apple", "apricot", "apex"]
+        for word in words:
+            trie.add_word(word)
+        result = trie.search_word("apple")
+        self.assertTrue(result)
